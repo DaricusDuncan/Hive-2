@@ -1,4 +1,4 @@
-from flask import Flask
+from flask import Flask, url_for
 from flask_restx import Api
 from flask_cors import CORS
 from core.config import Config
@@ -53,7 +53,7 @@ def create_app():
         authorizations=authorizations,
         security='Bearer',
         doc='/',
-        prefix='/api/v1'
+        prefix='/api/v1'  # Default version prefix
     )
 
     # Register namespaces

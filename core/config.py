@@ -21,8 +21,14 @@ class Config:
 
     # API settings
     API_TITLE = 'Secure REST API'
-    API_VERSION = '1.0'
-    API_DESCRIPTION = 'A secure REST API with JWT authentication'
+    API_VERSIONS = ['v1', 'v2']
+    API_DEFAULT_VERSION = 'v1'
+    API_VERSION = '2.0'  # Updated to reflect multiple versions support
+    API_DESCRIPTION = '''A secure REST API with JWT authentication
+    
+    Available versions:
+    - v1: Basic API functionality
+    - v2: Enhanced API with additional user information'''
 
     # Rate limiting
     RATELIMIT_DEFAULT = "100/hour"

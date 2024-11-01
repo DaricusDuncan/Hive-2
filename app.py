@@ -6,6 +6,8 @@ from core.database import db
 from core.security import jwt, talisman, limiter
 from api.auth import auth_ns
 from api.resources import api_ns
+from models.user import User
+from models.role import Role
 
 def create_app():
     app = Flask(__name__)
@@ -28,6 +30,12 @@ def create_app():
     talisman.init_app(app, content_security_policy=csp, force_https=False)
     limiter.init_app(app)
 
+    # User loader for JWT
+    @jwt.user_lookup_loader
+    def user_lookup_callback(_jwt_header, jwt_data):
+        identity = jwt_data["sub"]
+        return User.query.filter_by(id=identity).one_or_none()
+
     # Initialize API with Swagger
     authorizations = {
         'Bearer': {
@@ -44,17 +52,31 @@ def create_app():
         description=Config.API_DESCRIPTION,
         authorizations=authorizations,
         security='Bearer',
-        doc='/',  # Swagger UI at root URL
-        prefix='/api/v1'  # Add version prefix to all routes
+        doc='/',
+        prefix='/api/v1'
     )
 
     # Register namespaces
-    api.add_namespace(auth_ns)  # Will be prefixed with /api/v1
-    api.add_namespace(api_ns)   # Will be prefixed with /api/v1
+    api.add_namespace(auth_ns)
+    api.add_namespace(api_ns)
 
-    # Create database tables
+    # Create database tables and default roles
     with app.app_context():
         db.create_all()
+        
+        # Create default roles if they don't exist
+        default_roles = [
+            ('admin', 'Administrator with full access'),
+            ('moderator', 'Moderator with limited administrative access'),
+            ('user', 'Regular user with basic access')
+        ]
+        
+        for role_name, description in default_roles:
+            if not Role.query.filter_by(name=role_name).first():
+                role = Role(name=role_name, description=description)
+                db.session.add(role)
+        
+        db.session.commit()
 
     return app
 

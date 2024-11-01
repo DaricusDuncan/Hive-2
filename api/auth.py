@@ -6,6 +6,7 @@ from flask_jwt_extended import (
 )
 from core.database import db
 from models.user import User
+from models.role import Role
 from models.token import TokenBlacklist
 from api.schemas import user_schema, auth_schema
 from core.security import limiter
@@ -40,6 +41,11 @@ class Register(Resource):
         user.username = data['username']
         user.email = data['email']
         user.set_password(data['password'])
+        
+        # Assign default user role
+        user_role = Role.query.filter_by(name='user').first()
+        if user_role:
+            user.roles.append(user_role)
 
         db.session.add(user)
         db.session.commit()
@@ -58,7 +64,12 @@ class Login(Resource):
         if not user or not user.check_password(data['password']):
             return {'message': 'Invalid credentials'}, 401
 
-        access_token = create_access_token(identity=user.id)
+        # Include user roles in JWT claims
+        additional_claims = {
+            'roles': [role.name for role in user.roles]
+        }
+        
+        access_token = create_access_token(identity=user.id, additional_claims=additional_claims)
         refresh_token = create_refresh_token(identity=user.id)
 
         return {
@@ -72,7 +83,14 @@ class TokenRefresh(Resource):
     @auth_ns.doc(responses={200: 'Success', 401: 'Unauthorized'})
     def post(self):
         current_user_id = get_jwt_identity()
-        access_token = create_access_token(identity=current_user_id)
+        user = User.query.get(current_user_id)
+        
+        # Include user roles in new access token
+        additional_claims = {
+            'roles': [role.name for role in user.roles]
+        }
+        
+        access_token = create_access_token(identity=current_user_id, additional_claims=additional_claims)
         return {'access_token': access_token}, 200
 
 @auth_ns.route('/logout')
@@ -83,9 +101,7 @@ class Logout(Resource):
         token = get_jwt()
         jti = token["jti"]
         ttype = "access"
-        now = datetime.now(timezone.utc)
         
-        # Store the revoked token in the blacklist
         db_token = TokenBlacklist(
             jti=jti,
             token_type=ttype,
@@ -105,9 +121,7 @@ class LogoutRefresh(Resource):
         token = get_jwt()
         jti = token["jti"]
         ttype = "refresh"
-        now = datetime.now(timezone.utc)
         
-        # Store the revoked refresh token in the blacklist
         db_token = TokenBlacklist(
             jti=jti,
             token_type=ttype,

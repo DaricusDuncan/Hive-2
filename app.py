@@ -6,6 +6,7 @@ from core.database import db
 from core.security import jwt, talisman, limiter
 from api.auth import auth_ns
 from api.resources import api_ns
+from api.github import github_ns
 from models.user import User
 from models.role import Role
 
@@ -59,6 +60,7 @@ def create_app():
     # Register namespaces
     api.add_namespace(auth_ns)
     api.add_namespace(api_ns)
+    api.add_namespace(github_ns)
 
     # Create database tables and default roles
     with app.app_context():

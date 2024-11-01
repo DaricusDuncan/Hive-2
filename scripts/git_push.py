@@ -19,7 +19,6 @@ def configure_git():
         subprocess.run(['git', 'config', '--global', 'credential.helper', 'store'], check=True)
         
         # Set up the remote repository URL with token
-        remote_url = "https://github.com/DaricusDuncan/Hive-2"
         token_url = f'https://oauth2:{token}@github.com/DaricusDuncan/Hive-2'
         
         # Remove existing remote if any
@@ -38,11 +37,21 @@ def push_changes():
         if not configure_git():
             return False
         
-        # Add all changes
-        subprocess.run(['git', 'add', '.'], check=True)
+        # Stage all documentation changes
+        docs_files = [
+            'README.md',
+            'CONTRIBUTING.md',
+            'CHANGELOG.md',
+            'COMMIT_CONVENTION.md',
+            'docs/API.md',
+            'docs/SECURITY.md'
+        ]
+        
+        for file in docs_files:
+            subprocess.run(['git', 'add', file], check=True)
         
         # Commit changes with a conventional commit message
-        subprocess.run(['git', 'commit', '-m', 'chore(config): set up git configuration and resolve push issues'], check=True)
+        subprocess.run(['git', 'commit', '-m', 'docs(all): update project documentation'], check=True)
         
         # Push changes to main branch
         subprocess.run(['git', 'push', '-u', 'origin', 'main'], check=True)

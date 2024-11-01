@@ -1,85 +1,102 @@
 # Secure REST API with Flask
 
 ## Overview
-A secure REST API built with Flask, featuring JWT authentication, Swagger documentation, and PostgreSQL integration.
+A secure REST API built with Flask, featuring JWT authentication, Swagger documentation, PostgreSQL integration, and GitHub integration.
 
 ## Features
-- JWT Authentication with refresh tokens
+- JWT Authentication with refresh tokens and token blacklisting
 - Interactive Swagger UI documentation
 - PostgreSQL database integration
+- Role-Based Access Control (RBAC)
+- API versioning (v1 and v2)
 - Rate limiting and security features (CORS, CSP)
-- User registration and authentication
-- Protected API endpoints
+- GitHub API integration with issue analysis
+- Automated testing suite
+- Professional commit message convention
 
 ## Prerequisites
 - Python 3.11+
 - PostgreSQL database
-- Required environment variables:
-  - DATABASE_URL
-  - FLASK_SECRET_KEY
-  - Other PostgreSQL configuration variables
+- GitHub account and personal access token
 
-## Installation
+## Quick Start
+
+### 1. Environment Setup
 ```bash
 # Clone repository
-git clone <repository-url>
-cd secure-api-wizard
+git clone https://github.com/yourusername/hive-2.git
+cd hive-2
 
 # Install dependencies
 pip install -r requirements.txt
 
 # Set up environment variables
 export FLASK_SECRET_KEY='your-secret-key'
-export DATABASE_URL='postgresql://...'
+export GITHUB_TOKEN='your-github-token'
+```
 
-# Run the application
+### 2. Database Setup
+PostgreSQL connection details will be automatically configured when running on Replit.
+
+### 3. Run the Application
+```bash
 python main.py
 ```
 
-## API Documentation
-Access the interactive API documentation at `http://localhost:8000/`
+Access the API documentation at `http://localhost:8000/`
 
-### Available Endpoints
-#### Authentication
-- POST /api/v1/auth/register - Register new user
-- POST /api/v1/auth/login - Login and get JWT tokens
-- POST /api/v1/auth/refresh - Refresh access token
-- POST /api/v1/auth/logout - Logout (revoke token)
+## Documentation
+- [API Documentation](docs/API.md)
+- [Contributing Guidelines](CONTRIBUTING.md)
+- [Security Policy](docs/SECURITY.md)
+- [Commit Convention](COMMIT_CONVENTION.md)
+- [Changelog](CHANGELOG.md)
 
-#### Protected Resources
-- GET /api/v1/api/users - List all users
-- GET /api/v1/api/users/{id} - Get user by ID
-- GET /api/v1/api/profile - Get current user profile
+## Project Structure
+```
+├── api/                  # API endpoints and resources
+│   ├── auth.py          # Authentication endpoints
+│   ├── github.py        # GitHub integration endpoints
+│   ├── resources.py     # Main API resources
+│   └── schemas.py       # Data schemas
+├── core/                # Core functionality
+│   ├── config.py        # Configuration settings
+│   ├── database.py      # Database setup
+│   ├── rbac.py         # Role-based access control
+│   ├── security.py      # Security features
+│   └── version.py       # API versioning
+├── models/              # Database models
+├── services/            # Business logic services
+├── scripts/             # Utility scripts
+├── tests/              # Test suites
+└── docs/               # Documentation
+```
 
-## Security Features
-- JWT Authentication
-- Token refresh mechanism
-- Rate limiting (100 requests per hour)
-- CORS protection
-- Content Security Policy (CSP)
-- Token blacklisting
-- Secure password hashing
+## API Versioning
+The API supports multiple versions:
+- V1: Basic functionality
+- V2: Enhanced responses with additional fields
+
+Use appropriate version in URL: `/api/v1/` or `/api/v2/`
 
 ## Development
-The application uses Flask-RESTX for API development and Swagger documentation. Key configuration files:
-- `app.py` - Application setup
-- `core/config.py` - Configuration settings
-- `api/` - API endpoints and resources
-- `models/` - Database models
-
-## Deployment
-Currently configured for development. For production:
-1. Use a production WSGI server
-2. Enable HTTPS
-3. Set appropriate environment variables
-4. Configure proper database credentials
-
-## License
-MIT License
-
-## Contributing
 1. Fork the repository
 2. Create a feature branch
-3. Commit your changes
-4. Push to the branch
-5. Create a Pull Request
+3. Follow commit message convention
+4. Add tests for new features
+5. Submit a pull request
+
+## Testing
+```bash
+# Run test suite
+python -m pytest
+
+# Run with coverage
+python -m pytest --cov=.
+```
+
+## Security
+For security concerns, please see our [Security Policy](docs/SECURITY.md).
+
+## License
+MIT License - see [LICENSE](LICENSE) for details

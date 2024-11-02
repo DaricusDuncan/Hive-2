@@ -930,6 +930,7 @@ dependencies = [
     { name = "pytest-cov" },
     { name = "pytest-timeout" },
     { name = "python-dotenv" },
+    { name = "requests" },
     { name = "selenium" },
     { name = "webdriver-manager" },
 ]
@@ -953,6 +954,7 @@ requires-dist = [
     { name = "pytest-cov", specifier = ">=6.0.0" },
     { name = "pytest-timeout", specifier = ">=2.3.1" },
     { name = "python-dotenv" },
+    { name = "requests", specifier = ">=2.32.3" },
     { name = "selenium", specifier = ">=4.26.1" },
     { name = "webdriver-manager", specifier = ">=4.0.2" },
 ]

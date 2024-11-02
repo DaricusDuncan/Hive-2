@@ -33,3 +33,7 @@ class Config:
     # Rate limiting
     RATELIMIT_DEFAULT = "100/hour"
     RATELIMIT_STORAGE_URL = "memory://"
+    
+    # Ollama settings
+    OLLAMA_API_URL = os.environ.get('OLLAMA_API_URL', 'http://localhost:11434')
+    OLLAMA_MODEL = os.environ.get('OLLAMA_MODEL', 'llama2')

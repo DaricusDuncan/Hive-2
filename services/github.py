@@ -5,6 +5,7 @@ import re
 from collections import defaultdict
 import numpy as np
 from functools import lru_cache
+from services.ollama import OllamaService
 
 class GitHubService:
     def __init__(self):
@@ -12,6 +13,7 @@ class GitHubService:
         self._security_keywords = {'security', 'vulnerability', 'exploit', 'csrf', 'xss', 'injection', 'authentication'}
         self._performance_keywords = {'performance', 'optimization', 'slow', 'memory', 'cpu', 'latency', 'bottleneck'}
         self._ux_keywords = {'usability', 'user experience', 'ux', 'ui', 'interface', 'accessibility', 'responsive'}
+        self.ollama = OllamaService()
     
     @lru_cache(maxsize=100)
     def get_user_info(self):
@@ -115,11 +117,21 @@ class GitHubService:
             'ux': min(max(ux_score, 1), 10)
         }
 
-    def _estimate_implementation_time(self, complexity, impact_scores):
-        """Estimate implementation time in hours based on complexity and impact scores"""
+    def _estimate_implementation_time(self, complexity, impact_scores, ai_analysis=None):
+        """Estimate implementation time in hours based on complexity, impact scores, and AI analysis"""
         base_time = complexity * 2  # Base time in hours
         impact_factor = max(impact_scores.values()) / 10  # Impact factor 0-1
         
+        # Include AI analysis if available
+        if ai_analysis and isinstance(ai_analysis, dict):
+            ai_complexity = ai_analysis.get('technical_complexity', 5) / 10
+            effort_map = {'low': 0.7, 'medium': 1.0, 'high': 1.3}
+            ai_effort = effort_map.get(
+                ai_analysis.get('implementation_effort', 'medium').lower(), 
+                1.0
+            )
+            return round(base_time * (1 + impact_factor) * ((ai_complexity + ai_effort) / 2))
+            
         return round(base_time * (1 + impact_factor))
 
     @lru_cache(maxsize=200)
@@ -134,10 +146,23 @@ class GitHubService:
             complexity = self._calculate_text_complexity(content)
             impact_scores = self._calculate_impact_scores(content)
             
-            # Estimate implementation time
-            implementation_time = self._estimate_implementation_time(complexity, impact_scores)
+            # Get AI analysis if available
+            ai_analysis = None
+            if self.ollama.health_check():
+                ai_analysis = self.ollama.analyze_issue({
+                    'title': issue.title,
+                    'body': issue.body
+                })
             
-            return {
+            # Estimate implementation time
+            implementation_time = self._estimate_implementation_time(
+                complexity, 
+                impact_scores,
+                ai_analysis
+            )
+            
+            # Combine traditional and AI analysis
+            analysis = {
                 'issue_number': issue_number,
                 'title': issue.title,
                 'complexity': complexity,
@@ -149,38 +174,22 @@ class GitHubService:
                 'created_at': issue.created_at,
                 'updated_at': issue.updated_at
             }
+            
+            # Include AI insights if available
+            if ai_analysis:
+                analysis.update({
+                    'ai_insights': {
+                        'required_expertise': ai_analysis.get('required_expertise', []),
+                        'potential_risks': ai_analysis.get('potential_risks', [])
+                    }
+                })
+            
+            return analysis
+            
         except Exception as e:
+            print(f"Error analyzing issue: {str(e)}")
             return None
 
-    def score_issue(self, issue_analysis):
-        """Calculate composite score for an issue"""
-        if not issue_analysis:
-            return 0
-        
-        # Weights for different factors
-        weights = {
-            'complexity': 0.25,
-            'security_impact': 0.3,
-            'performance_impact': 0.2,
-            'ux_impact': 0.15,
-            'implementation_time': 0.1
-        }
-        
-        # Normalize implementation time to 1-10 scale
-        normalized_time = min(10, max(1, 10 - (issue_analysis['implementation_time'] / 8)))
-        
-        # Calculate weighted score
-        score = (
-            weights['complexity'] * issue_analysis['complexity'] +
-            weights['security_impact'] * issue_analysis['security_impact'] +
-            weights['performance_impact'] * issue_analysis['performance_impact'] +
-            weights['ux_impact'] * issue_analysis['ux_impact'] +
-            weights['implementation_time'] * normalized_time
-        )
-        
-        return round(score, 2)
-
-    @lru_cache(maxsize=100)
     def analyze_issue_dependencies(self, owner, repo_name, issue_number):
         """Analyze dependencies between issues"""
         try:
@@ -276,3 +285,31 @@ class GitHubService:
             
         except Exception:
             return []
+
+    def score_issue(self, issue_analysis):
+        """Calculate composite score for an issue"""
+        if not issue_analysis:
+            return 0
+        
+        # Weights for different factors
+        weights = {
+            'complexity': 0.25,
+            'security_impact': 0.3,
+            'performance_impact': 0.2,
+            'ux_impact': 0.15,
+            'implementation_time': 0.1
+        }
+        
+        # Normalize implementation time to 1-10 scale
+        normalized_time = min(10, max(1, 10 - (issue_analysis['implementation_time'] / 8)))
+        
+        # Calculate weighted score
+        score = (
+            weights['complexity'] * issue_analysis['complexity'] +
+            weights['security_impact'] * issue_analysis['security_impact'] +
+            weights['performance_impact'] * issue_analysis['performance_impact'] +
+            weights['ux_impact'] * issue_analysis['ux_impact'] +
+            weights['implementation_time'] * normalized_time
+        )
+        
+        return round(score, 2)

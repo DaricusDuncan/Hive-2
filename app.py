@@ -1,4 +1,4 @@
-from flask import Flask, url_for
+from flask import Flask, url_for, send_from_directory
 from flask_restx import Api
 from flask_cors import CORS
 from core.config import Config
@@ -11,7 +11,7 @@ from models.user import User
 from models.role import Role
 
 def create_app():
-    app = Flask(__name__)
+    app = Flask(__name__, static_url_path='/static')
     app.config.from_object(Config)
 
     # Initialize CORS
@@ -23,10 +23,12 @@ def create_app():
     
     # Configure Talisman with relaxed CSP for Swagger UI
     csp = {
-        'default-src': "'self'",
-        'img-src': "'self' data:",
-        'script-src': "'self' 'unsafe-inline' 'unsafe-eval'",
-        'style-src': "'self' 'unsafe-inline'",
+        'default-src': ["'self'"],
+        'img-src': ["'self'", 'data:', 'https:'],
+        'script-src': ["'self'", "'unsafe-inline'", "'unsafe-eval'"],
+        'style-src': ["'self'", "'unsafe-inline'"],
+        'connect-src': ["'self'", 'https:', 'http:'],
+        'font-src': ["'self'", 'data:'],
     }
     talisman.init_app(app, content_security_policy=csp, force_https=False)
     limiter.init_app(app)
@@ -36,6 +38,15 @@ def create_app():
     def user_lookup_callback(_jwt_header, jwt_data):
         identity = jwt_data["sub"]
         return User.query.filter_by(id=identity).one_or_none()
+
+    # Serve static files
+    @app.route('/static/<path:path>')
+    def send_static(path):
+        return send_from_directory('static', path)
+
+    @app.route('/swaggerui/<path:filename>')
+    def serve_swagger_ui(filename):
+        return send_from_directory('static/swagger-ui', filename)
 
     # Initialize API with Swagger
     authorizations = {

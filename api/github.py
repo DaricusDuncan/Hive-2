@@ -3,10 +3,11 @@ from flask_jwt_extended import jwt_required, current_user
 from services.github import GitHubService
 from core.rbac import role_required
 from core.security import limiter
+from urllib.parse import urlparse
 
 github_ns = Namespace('github', description='GitHub API operations')
 
-# Models for request/response
+# Existing models...
 repository_model = github_ns.model('Repository', {
     'name': fields.String(required=True, description='Repository name'),
     'description': fields.String(description='Repository description'),
@@ -75,6 +76,12 @@ prioritized_issue_model = github_ns.model('PrioritizedIssue', {
     'dependencies': fields.List(fields.Nested(issue_dependency_model))
 })
 
+# New model for repository URL analysis request
+repo_url_analysis_request = github_ns.model('RepoUrlAnalysisRequest', {
+    'repository_url': fields.String(required=True, description='GitHub repository URL')
+})
+
+# Existing endpoints...
 @github_ns.route('/user')
 class GitHubUserInfo(Resource):
     @jwt_required()
@@ -178,3 +185,38 @@ class PrioritizedIssues(Resource):
         if issues is None:
             github_ns.abort(404, f"Repository {owner}/{repo_name} not found or analysis failed")
         return issues
+
+# New endpoint for repository URL analysis
+@github_ns.route('/analyze')
+class RepositoryURLAnalysis(Resource):
+    @jwt_required()
+    @github_ns.expect(repo_url_analysis_request)
+    @github_ns.marshal_list_with(prioritized_issue_model)
+    @github_ns.doc(security='Bearer')
+    @limiter.limit("10/hour")
+    def post(self):
+        """Analyze issues from a GitHub repository URL"""
+        data = github_ns.payload
+        repo_url = data.get('repository_url')
+        
+        # Parse repository URL
+        try:
+            parsed_url = urlparse(repo_url)
+            path_parts = [p for p in parsed_url.path.split('/') if p]
+            
+            if len(path_parts) < 2:
+                github_ns.abort(400, "Invalid repository URL format")
+            
+            owner, repo_name = path_parts[0], path_parts[1]
+            
+            # Initialize GitHub service and analyze repository issues
+            github = GitHubService()
+            issues = github.prioritize_issues(owner, repo_name)
+            
+            if issues is None:
+                github_ns.abort(404, f"Repository {owner}/{repo_name} not found or analysis failed")
+            
+            return issues
+            
+        except Exception as e:
+            github_ns.abort(400, f"Error analyzing repository: {str(e)}")

@@ -11,13 +11,41 @@ A secure REST API built with Flask, featuring JWT authentication, Swagger docume
 - API versioning (v1 and v2)
 - Rate limiting and security features (CORS, CSP)
 - GitHub API integration with issue analysis
+- AI-powered issue analysis with Ollama
 - Automated testing suite
 - Professional commit message convention
 
 ## Prerequisites
 - Python 3.11+
-- PostgreSQL database
+- PostgreSQL database (automatically configured on Replit)
 - GitHub account and personal access token
+- Ollama instance (optional, for AI analysis)
+
+## Environment Variables
+The following environment variables need to be configured:
+
+### Required
+```bash
+FLASK_SECRET_KEY=your-secret-key                # Secret key for Flask application
+GITHUB_TOKEN=your-github-token                  # GitHub personal access token
+```
+
+### Optional (Ollama Integration)
+```bash
+OLLAMA_API_URL=http://localhost:11434          # Ollama API endpoint
+OLLAMA_MODEL=llama2                            # Ollama model to use
+```
+
+### Database Configuration
+When running on Replit, the following variables are automatically configured:
+```bash
+DATABASE_URL                                    # Full database connection URL
+PGHOST                                         # PostgreSQL host
+PGPORT                                         # PostgreSQL port
+PGUSER                                         # PostgreSQL username
+PGPASSWORD                                     # PostgreSQL password
+PGDATABASE                                     # PostgreSQL database name
+```
 
 ## Quick Start
 
@@ -45,7 +73,7 @@ python main.py
 
 Access the API documentation at `http://localhost:8000/`
 
-## Documentation
+## API Documentation
 - [API Documentation](docs/API.md)
 - [Contributing Guidelines](CONTRIBUTING.md)
 - [Security Policy](docs/SECURITY.md)
@@ -67,9 +95,11 @@ Access the API documentation at `http://localhost:8000/`
 │   └── version.py       # API versioning
 ├── models/              # Database models
 ├── services/            # Business logic services
+│   ├── github.py        # GitHub API integration
+│   └── ollama.py        # AI analysis integration
 ├── scripts/             # Utility scripts
-├── tests/              # Test suites
-└── docs/               # Documentation
+├── tests/               # Test suites
+└── docs/                # Documentation
 ```
 
 ## API Versioning

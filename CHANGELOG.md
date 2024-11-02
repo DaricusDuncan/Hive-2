@@ -8,6 +8,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 ## [2.0.0] - 2024-11-01
 
 ### Added
+
 - GitHub API integration with issue analysis
 - API versioning (v1 and v2)
 - Role-Based Access Control (RBAC)
@@ -20,12 +21,14 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - Professional commit message convention
 
 ### Changed
+
 - Enhanced user endpoints with additional fields in v2
 - Improved security features
 - Updated dependency versions
 - Restructured project layout
 
 ### Security
+
 - Implemented token blacklisting
 - Added rate limiting
 - Enhanced CORS protection
@@ -34,6 +37,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 ## [1.0.0] - 2024-10-01
 
 ### Added
+
 - Initial release
 - JWT authentication
 - Basic user management

@@ -19,6 +19,10 @@ args = "API Server"
 task = "workflow.run"
 args = "API Tests"
 
+[[workflows.workflow.tasks]]
+task = "workflow.run"
+args = "Test Ollama"
+
 [[workflows.workflow]]
 name = "API Server"
 author = "agent"
@@ -31,8 +35,8 @@ task = "packager.installForAll"
 
 [[workflows.workflow.tasks]]
 task = "shell.exec"
-args = "python main.py"
-waitForPort = 8000
+args = "FLASK_TESTING=true python main.py"
+waitForPort = 5000
 
 [[workflows.workflow]]
 name = "API Tests"
@@ -46,11 +50,34 @@ task = "packager.installForAll"
 
 [[workflows.workflow.tasks]]
 task = "shell.exec"
-args = "python -m pytest"
+args = "python -m pytest -v --cov=. --cov-report=term-missing"
+
+[[workflows.workflow]]
+name = "Test Ollama"
+author = "agent"
+
+[workflows.workflow.metadata]
+agentRequireRestartOnSave = false
+
+[[workflows.workflow.tasks]]
+task = "packager.installForAll"
+
+[[workflows.workflow.tasks]]
+task = "shell.exec"
+args = "python -m pytest tests/test_ollama_connection.py -v"
 
 [deployment]
-run = ["sh", "-c", "python main.py"]
+run = ["sh", "-c", "FLASK_TESTING=true python main.py"]
+
+[[ports]]
+localPort = 5000
+externalPort = 5000
 
 [[ports]]
 localPort = 8000
 externalPort = 80
+
+[[ports]]
+localPort = 11434
+externalPort = 3000
+exposeLocalhost = true

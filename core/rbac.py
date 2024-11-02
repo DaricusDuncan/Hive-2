@@ -6,12 +6,15 @@ def role_required(*role_names):
     def wrapper(fn):
         @wraps(fn)
         def decorator(*args, **kwargs):
-            verify_jwt_in_request()
-            user = get_current_user()
-            
-            if not user.has_any_role(role_names):
+            try:
+                verify_jwt_in_request()
+                user = get_current_user()
+                
+                if not user or not user.has_any_role(role_names):
+                    return jsonify({"msg": "Insufficient permissions"}), 403
+                return fn(*args, **kwargs)
+            except Exception:
                 return jsonify({"msg": "Insufficient permissions"}), 403
-            return fn(*args, **kwargs)
         return decorator
     return wrapper
 

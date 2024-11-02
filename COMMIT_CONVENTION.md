@@ -3,7 +3,9 @@
 This project follows the [Conventional Commits](https://www.conventionalcommits.org/) specification for commit messages.
 
 ## Format
+
 Each commit message consists of:
+
 ```
 <type>(<scope>): <description>
 
@@ -13,6 +15,7 @@ Each commit message consists of:
 ```
 
 ### Types
+
 - `feat`: A new feature
 - `fix`: A bug fix
 - `docs`: Documentation only changes
@@ -25,7 +28,9 @@ Each commit message consists of:
 - `revert`: Reverts a previous commit
 
 ### Scope
+
 The scope provides additional contextual information and should be one of:
+
 - `auth`: Authentication related changes
 - `api`: API endpoints and resources
 - `db`: Database related changes
@@ -35,11 +40,13 @@ The scope provides additional contextual information and should be one of:
 - `docs`: Documentation changes
 
 ### Description
+
 - Use the imperative, present tense: "change" not "changed" nor "changes"
 - Don't capitalize the first letter
 - No dot (.) at the end
 
 ### Examples
+
 ```
 feat(auth): add refresh token blacklisting
 fix(api): resolve rate limiting issue in user endpoints
@@ -51,7 +58,9 @@ chore(deps): update dependencies to latest versions
 ```
 
 ### Breaking Changes
+
 When a commit includes a breaking change, it must be indicated in the footer with a `BREAKING CHANGE:` prefix:
+
 ```
 feat(api): change user authentication endpoint
 
@@ -59,9 +68,11 @@ BREAKING CHANGE: The authentication endpoint now requires an additional 'client_
 ```
 
 ## Git Hooks Setup
+
 To ensure commit message compliance, consider setting up Git hooks that validate commit messages against this convention.
 
 ## Benefits
+
 - Automatically generating CHANGELOGs
 - Determining semantic version bumps
 - Communicating the nature of changes to teammates and stakeholders

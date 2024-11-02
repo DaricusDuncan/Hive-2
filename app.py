@@ -77,19 +77,24 @@ def create_app():
     with app.app_context():
         db.create_all()
         
-        # Create default roles if they don't exist
-        default_roles = [
-            ('admin', 'Administrator with full access'),
-            ('moderator', 'Moderator with limited administrative access'),
-            ('user', 'Regular user with basic access')
-        ]
-        
-        for role_name, description in default_roles:
-            if not Role.query.filter_by(name=role_name).first():
-                role = Role(name=role_name, description=description)
-                db.session.add(role)
-        
-        db.session.commit()
+        if not app.config['TESTING']:  # Skip in test environment
+            try:
+                # Create default roles if they don't exist
+                default_roles = [
+                    ('admin', 'Administrator with full access'),
+                    ('moderator', 'Moderator with limited administrative access'),
+                    ('user', 'Regular user with basic access')
+                ]
+                
+                for role_name, description in default_roles:
+                    if not Role.query.filter_by(name=role_name).first():
+                        role = Role(name=role_name, description=description)
+                        db.session.add(role)
+                
+                db.session.commit()
+            except Exception as e:
+                print(f"Error creating default roles: {str(e)}")
+                db.session.rollback()
 
     return app
 

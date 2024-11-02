@@ -5,11 +5,12 @@
 | Version | Supported          |
 | ------- | ------------------ |
 | 2.x.x   | :white_check_mark: |
-| 1.x.x   | :x:               |
+| 1.x.x   | :x:                |
 
 ## Security Features
 
 ### Authentication
+
 - JWT-based authentication
 - Refresh token mechanism
 - Token blacklisting for secure logout
@@ -17,17 +18,20 @@
 - Rate limiting on authentication endpoints
 
 ### Authorization
+
 - Role-Based Access Control (RBAC)
 - Fine-grained permission system
 - Role inheritance hierarchy
 
 ### Data Protection
+
 - PostgreSQL with connection pooling
 - Prepared statements for SQL queries
 - Input validation using marshmallow schemas
 - XSS protection through Content Security Policy
 
 ### API Security
+
 - Rate limiting on all endpoints
 - CORS protection
 - Secure headers configuration
@@ -44,18 +48,21 @@
 ## Security Best Practices
 
 ### Password Requirements
+
 - Minimum 8 characters
 - Mix of uppercase and lowercase
 - Include numbers and special characters
 - No common dictionary words
 
 ### Token Management
+
 - Access tokens expire in 1 hour
 - Refresh tokens expire in 30 days
 - Tokens are blacklisted on logout
 - JWT claims are validated on each request
 
 ### API Usage
+
 - Use HTTPS for all requests
 - Include authentication headers
 - Validate response data
@@ -64,18 +71,21 @@
 ## Development Guidelines
 
 ### Code Security
+
 - Follow OWASP security guidelines
 - Use parameterized queries
 - Validate all user input
 - Implement proper error handling
 
 ### Dependency Management
+
 - Regular security updates
 - Automated vulnerability scanning
 - Dependency version pinning
 - Security patch monitoring
 
 ### Environment Security
+
 - Use environment variables for secrets
 - Secure configuration management
 - Production environment hardening

@@ -3,11 +3,14 @@
 ## Authentication
 
 ### JWT Token System
+
 The API uses JSON Web Tokens (JWT) for authentication with a dual-token system:
+
 - Access Token: Short-lived token (1 hour) for API access
 - Refresh Token: Long-lived token (30 days) for obtaining new access tokens
 
 ### Authentication Flow
+
 1. Register user account
 2. Login to receive tokens
 3. Use access token for API requests
@@ -17,9 +20,11 @@ The API uses JSON Web Tokens (JWT) for authentication with a dual-token system:
 ## API Versions
 
 ### Version 1 (v1)
+
 Base endpoint: `/api/v1`
 
 #### Authentication Endpoints
+
 ```http
 POST /auth/register
 Content-Type: application/json
@@ -76,6 +81,7 @@ Response: 200 OK
 ```
 
 #### User Management
+
 ```http
 GET /api/users
 Authorization: Bearer <access_token>
@@ -105,6 +111,7 @@ Response: 200 OK
 ```
 
 ### Version 2 (v2)
+
 Base endpoint: `/api/v2`
 
 Enhanced responses with additional fields:
@@ -129,11 +136,13 @@ Response: 200 OK
 ## Role-Based Access Control (RBAC)
 
 ### Available Roles
+
 - `admin`: Full system access
 - `moderator`: Limited administrative access
 - `user`: Basic access rights
 
 ### Role Management
+
 ```http
 GET /api/roles
 Authorization: Bearer <access_token>
@@ -168,6 +177,7 @@ Response: 201 Created
 ## GitHub Integration
 
 ### Repository Management
+
 ```http
 GET /github/repositories
 Authorization: Bearer <access_token>
@@ -186,6 +196,7 @@ Response: 200 OK
 ```
 
 ### Issue Analysis
+
 ```http
 GET /github/repository/{owner}/{repo}/issue/{number}/analysis
 Authorization: Bearer <access_token>
@@ -204,6 +215,7 @@ Response: 200 OK
 ```
 
 ## Rate Limiting
+
 - Default: 100 requests per hour
 - Authentication endpoints: 10 requests per minute
 - GitHub integration: 50 requests per hour
@@ -211,6 +223,7 @@ Response: 200 OK
 ## Error Responses
 
 ### Common Error Codes
+
 - 400: Bad Request
 - 401: Unauthorized
 - 403: Forbidden
@@ -218,14 +231,16 @@ Response: 200 OK
 - 429: Too Many Requests
 
 ### Error Response Format
+
 ```json
 {
-    "message": "Error description",
-    "error": "error_code"
+  "message": "Error description",
+  "error": "error_code"
 }
 ```
 
 ## Security Features
+
 - JWT token blacklisting
 - Rate limiting
 - CORS protection

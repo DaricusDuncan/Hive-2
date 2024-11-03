@@ -10,6 +10,9 @@ from api.github import github_ns
 from models.user import User
 from models.role import Role
 
+# At the top of app.py, after imports
+app = create_app()
+
 
 def create_app():
     app = Flask(__name__, static_url_path='/static')

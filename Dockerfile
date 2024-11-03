@@ -1,12 +1,14 @@
-# Use slim base image
+# Use Python slim base image
 FROM python:3.11-slim
 
 # Set working directory
 WORKDIR /app
 
-# Install only required system dependencies
+# Install system dependencies including those needed for numpy
 RUN apt-get update && apt-get install -y --no-install-recommends \
     postgresql-client \
+    build-essential \
+    python3-dev \
     && rm -rf /var/lib/apt/lists/*
 
 # Copy only requirements first to leverage Docker cache

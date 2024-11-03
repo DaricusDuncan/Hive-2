@@ -1,13 +1,32 @@
-Flask
-flask-restx
-flask-cors
-flask-sqlalchemy
-flask-jwt-extended
-flask-talisman
-flask-limiter
-werkzeug
-pytest
-pytest-cov
-requests
-python-dotenv
-js2py
+# Web Framework and Extensions
+Flask==3.0.0
+flask-restx==1.3.0
+flask-cors==4.0.0
+flask-sqlalchemy==3.1.1
+flask-jwt-extended==4.5.3
+flask-talisman==1.1.0
+flask-limiter==3.5.0
+Werkzeug==3.0.1
+
+# Database
+SQLAlchemy==2.0.23
+psycopg2-binary==2.9.9  # For PostgreSQL support
+
+# API and Serialization
+marshmallow==3.20.1
+PyGithub==2.1.1
+requests==2.31.0
+
+# Security
+python-dotenv==1.0.0
+cryptography==41.0.5
+bcrypt==4.0.1
+
+# Testing
+pytest==7.4.3
+pytest-cov==4.1.0
+pytest-flask==1.3.0
+
+# Utilities
+js2py==0.74
+python-dateutil==2.8.2

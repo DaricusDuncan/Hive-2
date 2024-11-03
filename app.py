@@ -10,6 +10,7 @@ from api.github import github_ns
 from models.user import User
 from models.role import Role
 
+
 def create_app():
     app = Flask(__name__, static_url_path='/static')
     app.config.from_object(Config)
@@ -20,7 +21,7 @@ def create_app():
     # Initialize extensions
     db.init_app(app)
     jwt.init_app(app)
-    
+
     # Configure Talisman with relaxed CSP for Swagger UI
     csp = {
         'default-src': ["'self'"],
@@ -76,26 +77,28 @@ def create_app():
     # Create database tables and default roles
     with app.app_context():
         db.create_all()
-        
+
         if not app.config['TESTING']:  # Skip in test environment
             try:
                 # Create default roles if they don't exist
                 default_roles = [
                     ('admin', 'Administrator with full access'),
-                    ('moderator', 'Moderator with limited administrative access'),
+                    ('moderator',
+                     'Moderator with limited administrative access'),
                     ('user', 'Regular user with basic access')
                 ]
-                
+
                 for role_name, description in default_roles:
                     if not Role.query.filter_by(name=role_name).first():
                         role = Role(name=role_name, description=description)
                         db.session.add(role)
-                
+
                 db.session.commit()
             except Exception as e:
                 print(f"Error creating default roles: {str(e)}")
                 db.session.rollback()
 
     return app
+
 
 app = create_app()

@@ -1,3 +1,4 @@
+# Previous imports remain the same...
 from github import Github
 import os
 from datetime import datetime, timedelta
@@ -161,7 +162,7 @@ class GitHubService:
                 ai_analysis
             )
             
-            # Combine traditional and AI analysis
+            # Base analysis results
             analysis = {
                 'issue_number': issue_number,
                 'title': issue.title,
@@ -179,8 +180,17 @@ class GitHubService:
             if ai_analysis:
                 analysis.update({
                     'ai_insights': {
+                        'technical_complexity': ai_analysis.get('technical_complexity'),
+                        'impact_assessment': ai_analysis.get('impact_assessment', {}),
+                        'implementation_effort': ai_analysis.get('implementation_effort'),
+                        'priority_level': ai_analysis.get('priority_level'),
                         'required_expertise': ai_analysis.get('required_expertise', []),
-                        'potential_risks': ai_analysis.get('potential_risks', [])
+                        'potential_risks': ai_analysis.get('potential_risks', []),
+                        'suggestions': [
+                            f"Priority: {ai_analysis.get('priority_level', 'medium').title()} - Consider implementing this issue with {ai_analysis.get('implementation_effort', 'medium')} effort",
+                            *[f"Required expertise: {exp}" for exp in ai_analysis.get('required_expertise', [])],
+                            *[f"Risk consideration: {risk}" for risk in ai_analysis.get('potential_risks', [])]
+                        ]
                     }
                 })
             
@@ -190,6 +200,7 @@ class GitHubService:
             print(f"Error analyzing issue: {str(e)}")
             return None
 
+    # Rest of the methods remain the same...
     def analyze_issue_dependencies(self, owner, repo_name, issue_number):
         """Analyze dependencies between issues"""
         try:
@@ -271,11 +282,17 @@ class GitHubService:
                         process_issue(dep_num)
                 
                 processed.add(issue_num)
-                prioritized_issues.append({
+                issue_data = {
                     **issue_analyses[issue_num],
                     'score': scores[issue_num],
                     'dependencies': dependency_map.get(issue_num, [])
-                })
+                }
+                
+                # Include AI suggestions if available
+                if 'ai_insights' in issue_analyses[issue_num]:
+                    issue_data['ai_insights'] = issue_analyses[issue_num]['ai_insights']
+                    
+                prioritized_issues.append(issue_data)
             
             # Process all issues
             for issue_num in sorted(scores, key=scores.get, reverse=True):
@@ -311,5 +328,14 @@ class GitHubService:
             weights['ux_impact'] * issue_analysis['ux_impact'] +
             weights['implementation_time'] * normalized_time
         )
+        
+        # Adjust score based on AI insights if available
+        if 'ai_insights' in issue_analysis:
+            ai_priority_map = {'low': 0.8, 'medium': 1.0, 'high': 1.2}
+            ai_score_multiplier = ai_priority_map.get(
+                issue_analysis['ai_insights'].get('priority_level', 'medium').lower(),
+                1.0
+            )
+            score *= ai_score_multiplier
         
         return round(score, 2)

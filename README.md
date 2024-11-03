@@ -60,11 +60,13 @@ PGDATABASE                                     # PostgreSQL database name
 ### Deploying on Replit
 
 1. Fork the repository to your Replit account:
+
    - Click the "Fork" button on Replit
    - Select Python as the language
    - Wait for the initial setup to complete
 
 2. Set up environment variables in Replit:
+
    - Go to "Tools" > "Secrets"
    - Add the following secrets:
      ```
@@ -73,15 +75,18 @@ PGDATABASE                                     # PostgreSQL database name
      ```
 
 3. Install dependencies:
+
    - Replit will automatically install dependencies from `pyproject.toml`
    - Dependencies include Flask, SQLAlchemy, JWT, and other required packages
 
 4. Database setup:
+
    - PostgreSQL is automatically provisioned on Replit
    - Database credentials are automatically configured as environment variables
    - Tables are created automatically on first run
 
 5. Start the application:
+
    - Click the "Run" button in Replit
    - The server will start on port 5000
    - Replit will provide a public URL for your API
@@ -94,10 +99,12 @@ PGDATABASE                                     # PostgreSQL database name
 ### Post-Deployment Steps
 
 1. Initialize default roles:
+
    - The system automatically creates admin, moderator, and user roles
    - First registered user can be promoted to admin through database
 
 2. Monitor the application:
+
    - Check Replit logs for errors
    - Monitor rate limiting and API usage
    - Review security alerts
@@ -109,11 +116,13 @@ PGDATABASE                                     # PostgreSQL database name
 ### Production Considerations
 
 1. Security:
+
    - Regularly rotate JWT secret keys
    - Monitor failed authentication attempts
    - Keep dependencies updated
 
 2. Performance:
+
    - Configure appropriate rate limits
    - Monitor database connections
    - Cache frequently accessed data

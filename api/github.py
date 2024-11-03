@@ -7,7 +7,7 @@ from urllib.parse import urlparse
 
 github_ns = Namespace('github', description='GitHub API operations')
 
-# Existing models...
+# Models
 repository_model = github_ns.model('Repository', {
     'name': fields.String(required=True, description='Repository name'),
     'description': fields.String(description='Repository description'),
@@ -35,6 +35,23 @@ user_info_model = github_ns.model('GitHubUser', {
     'following': fields.Integer()
 })
 
+# Enhanced models with AI insights
+ai_impact_assessment_model = github_ns.model('AIImpactAssessment', {
+    'security': fields.Float(),
+    'performance': fields.Float(),
+    'ux': fields.Float()
+})
+
+ai_insights_model = github_ns.model('AIInsights', {
+    'technical_complexity': fields.Float(),
+    'impact_assessment': fields.Nested(ai_impact_assessment_model),
+    'implementation_effort': fields.String(),
+    'priority_level': fields.String(),
+    'required_expertise': fields.List(fields.String()),
+    'potential_risks': fields.List(fields.String()),
+    'suggestions': fields.List(fields.String())
+})
+
 issue_analysis_model = github_ns.model('IssueAnalysis', {
     'issue_number': fields.Integer(),
     'title': fields.String(),
@@ -45,7 +62,8 @@ issue_analysis_model = github_ns.model('IssueAnalysis', {
     'implementation_time': fields.Integer(),
     'state': fields.String(),
     'created_at': fields.DateTime(),
-    'updated_at': fields.DateTime()
+    'updated_at': fields.DateTime(),
+    'ai_insights': fields.Nested(ai_insights_model)
 })
 
 issue_dependency_model = github_ns.model('IssueDependency', {
@@ -73,15 +91,16 @@ prioritized_issue_model = github_ns.model('PrioritizedIssue', {
     'state': fields.String(),
     'created_at': fields.DateTime(),
     'updated_at': fields.DateTime(),
-    'dependencies': fields.List(fields.Nested(issue_dependency_model))
+    'dependencies': fields.List(fields.Nested(issue_dependency_model)),
+    'ai_insights': fields.Nested(ai_insights_model)
 })
 
-# New model for repository URL analysis request
+# Request models
 repo_url_analysis_request = github_ns.model('RepoUrlAnalysisRequest', {
     'repository_url': fields.String(required=True, description='GitHub repository URL')
 })
 
-# Existing endpoints...
+# Endpoints
 @github_ns.route('/user')
 class GitHubUserInfo(Resource):
     @jwt_required()
@@ -151,7 +170,7 @@ class IssueAnalysis(Resource):
     @github_ns.doc(security='Bearer')
     @limiter.limit("50/hour")
     def get(self, owner, repo_name, issue_number):
-        """Analyze a specific issue"""
+        """Analyze a specific issue with AI-powered insights"""
         github = GitHubService()
         analysis = github.analyze_issue(owner, repo_name, issue_number)
         if not analysis:
@@ -179,14 +198,13 @@ class PrioritizedIssues(Resource):
     @github_ns.doc(security='Bearer')
     @limiter.limit("20/hour")
     def get(self, owner, repo_name):
-        """Get prioritized list of issues for a repository"""
+        """Get prioritized list of issues with AI-powered insights"""
         github = GitHubService()
         issues = github.prioritize_issues(owner, repo_name)
         if issues is None:
             github_ns.abort(404, f"Repository {owner}/{repo_name} not found or analysis failed")
         return issues
 
-# New endpoint for repository URL analysis
 @github_ns.route('/analyze')
 class RepositoryURLAnalysis(Resource):
     @jwt_required()
@@ -195,11 +213,10 @@ class RepositoryURLAnalysis(Resource):
     @github_ns.doc(security='Bearer')
     @limiter.limit("10/hour")
     def post(self):
-        """Analyze issues from a GitHub repository URL"""
+        """Analyze issues from a GitHub repository URL with AI-powered insights"""
         data = github_ns.payload
         repo_url = data.get('repository_url')
         
-        # Parse repository URL
         try:
             parsed_url = urlparse(repo_url)
             path_parts = [p for p in parsed_url.path.split('/') if p]
@@ -209,7 +226,6 @@ class RepositoryURLAnalysis(Resource):
             
             owner, repo_name = path_parts[0], path_parts[1]
             
-            # Initialize GitHub service and analyze repository issues
             github = GitHubService()
             issues = github.prioritize_issues(owner, repo_name)
             

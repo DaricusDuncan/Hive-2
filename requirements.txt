@@ -1,0 +1,13 @@
+Flask
+flask-restx
+flask-cors
+flask-sqlalchemy
+flask-jwt-extended
+flask-talisman
+flask-limiter
+werkzeug
+pytest
+pytest-cov
+requests
+python-dotenv
+js2py
